@@ -18,7 +18,6 @@ import math
 angleRatioToolBundle = mojo.extensions.ExtensionBundle("AngleRatioTool")
 toolbarIconPath = os.path.join(angleRatioToolBundle.resourcesPath(), "icon.pdf")
 toolbarIcon = AppKit.NSImage.alloc().initWithContentsOfFile_(toolbarIconPath)
-print(toolbarIcon)
 
 class RatioTool(EditingTool):
     balloonDistance = 100

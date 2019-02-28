@@ -1,4 +1,4 @@
-description: A RoboFont extension for browsing and selecting unicode values, glyphnames, categories, lists.
+description: This RoboFont extension shows the ratio between the length of incoming and outgoing sections of bcps and tangents. This can help in preparing masters for interpolation. 
 developer: LettError
 developerURL: http://letterror.com
 extensionName: AngleRatioTool
@@ -6,4 +6,4 @@ extensionPath: AngleRatioTool.roboFontExt
 repository: https://github.com/LettError/angleRatioTool
 tags: [ robofont outlines bezier contour ufo interpolation ]
 dateAdded: 2019-02-28 13:55:00
-icon: https://github.com/LettError/angleRatioTool/blob/master/GlyphBrowserMechanicIcon.png
+icon: https://github.com/LettError/angleRatioTool/blob/master/AngleRatioToolMechanicIcon.png
