@@ -1,0 +1,9 @@
+description: A RoboFont extension for browsing and selecting unicode values, glyphnames, categories, lists.
+developer: LettError
+developerURL: http://letterror.com
+extensionName: AngleRatioTool
+extensionPath: AngleRatioTool.roboFontExt
+repository: https://github.com/LettError/angleRatioTool
+tags: [ robofont outlines bezier contour ufo interpolation ]
+dateAdded: 2019-02-28 13:55:00
+icon: https://github.com/LettError/angleRatioTool/blob/master/GlyphBrowserMechanicIcon.png

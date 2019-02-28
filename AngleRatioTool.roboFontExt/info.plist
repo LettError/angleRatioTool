@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>addToMenu</key>
+	<array>
+		<dict>
+			<key>path</key>
+			<string>angleRatioTool.py</string>
+			<key>preferredName</key>
+			<string>Angle Ratio Tool</string>
+			<key>shortKey</key>
+			<string></string>
+		</dict>
+	</array>
+	<key>developer</key>
+	<string>LettError</string>
+	<key>developerURL</key>
+	<string>http://letterror.com</string>
+	<key>html</key>
+	<true/>
+	<key>launchAtStartUp</key>
+	<true/>
+	<key>mainScript</key>
+	<string>angleRatioTool.py</string>
+	<key>name</key>
+	<string>AngleRatioTool</string>
+	<key>requiresVersionMajor</key>
+	<string>3</string>
+	<key>requiresVersionMinor</key>
+	<string>2</string>
+	<key>timeStamp</key>
+	<real>1551358666.2751811</real>
+	<key>version</key>
+	<string>0.1</string>
+</dict>
+</plist>
