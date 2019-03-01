@@ -6,4 +6,4 @@ extensionPath: AngleRatioTool.roboFontExt
 repository: https://github.com/LettError/angleRatioTool
 tags: [ outline curve point tangent angle bezier contour glyph interpolation ]
 dateAdded: 2019-02-28 13:55:00
-icon: https://github.com/LettError/angleRatioTool/blob/master/AngleRatioToolMechanicIcon.png
+icon: https://raw.githubusercontent.com/LettError/angleRatioTool/master/AngleRatioToolMechanicIcon.png
