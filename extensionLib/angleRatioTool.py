@@ -8,7 +8,7 @@ from mojo.UI import UpdateCurrentGlyphView, getDefault
 import merz
 from merz.tools.drawingTools import NSImageDrawingTools
 
-#     A visualisation for RoboFont 4
+#     A visualisation for RoboFont 4 XX
 #     Show the ratio between the length of outgoing and incoming sections of bcps and tangents.
 #     Show the angle
 #     Draw in active and inactive views so we can compare different glyphs
@@ -20,6 +20,8 @@ toolbarIcon = AppKit.NSImage.alloc().initWithContentsOfFile_(toolbarIconPath)
 
 dot_size = int(getDefault('glyphViewOffCurvePointsSize')) * 3
 snap_size = dot_size + 6
+
+font_size = int(getDefault('textFontSize'))
 
 
 def dotSymbolFactory(
@@ -222,7 +224,7 @@ class RatioTool(EditingTool):
     def caption(self, point1, text1, point2, text2):
         pd_x = 10
         pd_y = 2
-        ps = 12
+        ps = font_size
         cr = ps
 
         ratioCaptionLayer = self.captionTextLayer.appendTextLineSublayer(
