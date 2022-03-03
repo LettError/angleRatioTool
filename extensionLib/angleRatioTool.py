@@ -21,7 +21,6 @@ toolbarIcon = AppKit.NSImage.alloc().initWithContentsOfFile_(toolbarIconPath)
 dot_size = int(getDefault('glyphViewOffCurvePointsSize')) * 3
 snap_size = dot_size + 6
 
-font_size = int(getDefault('textFontSize'))
 
 
 def dotSymbolFactory(
@@ -79,7 +78,8 @@ class RatioTool(EditingTool):
         self._rout = None
         self.markerWidth = 12
         self.snapThreshold = .5
-        
+        self.font_size = int(getDefault('textFontSize'))
+
         drawingLayer = self.extensionContainer(
             identifier="com.letterror.angleRatioTool", 
             location="background", 
@@ -224,7 +224,7 @@ class RatioTool(EditingTool):
     def caption(self, point1, text1, point2, text2):
         pd_x = 10
         pd_y = 2
-        ps = font_size
+        ps = self.font_size
         cr = ps
 
         ratioCaptionLayer = self.captionTextLayer.appendTextLineSublayer(
