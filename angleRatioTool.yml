@@ -1,9 +1,9 @@
-description: This RoboFont extension shows the ratio between the length of incoming and outgoing sections of bcps and tangents. This can help in preparing masters for interpolation. 
+description: Shows the ratio between the length of incoming and outgoing sections of bcps and tangents. This can help in preparing masters for interpolation.
 developer: LettError
 developerURL: http://letterror.com
 extensionName: AngleRatioTool
 extensionPath: AngleRatioTool.roboFontExt
 repository: https://github.com/LettError/angleRatioTool
-tags: [ outline curve point tangent angle bezier contour glyph interpolation ]
+tags: [contours, interpolation]
 dateAdded: 2019-02-28 13:55:00
 icon: https://raw.githubusercontent.com/LettError/angleRatioTool/master/AngleRatioToolMechanicIcon.png
