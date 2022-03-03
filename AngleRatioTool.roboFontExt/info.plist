@@ -26,12 +26,12 @@
 	<key>name</key>
 	<string>AngleRatioTool</string>
 	<key>requiresVersionMajor</key>
-	<string>3</string>
+	<string>4</string>
 	<key>requiresVersionMinor</key>
-	<string>2</string>
+	<string>1</string>
 	<key>timeStamp</key>
-	<real>1551359123.8662081</real>
+	<real>1646333593.5190568</real>
 	<key>version</key>
-	<string>0.1</string>
+	<string>0.2</string>
 </dict>
 </plist>

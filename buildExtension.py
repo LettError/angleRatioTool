@@ -53,7 +53,7 @@ if resourcesPath:
     B.icon = imagePath
 
 # version of the extension
-B.version = '0.1'
+B.version = '0.2'
 
 # should the extension be launched at start-up?
 B.launchAtStartUp = True
@@ -65,8 +65,8 @@ B.mainScript = 'angleRatioTool.py'
 B.html = htmlPath is not None
 
 # minimum RoboFont version required for this extension
-B.requiresVersionMajor = '3'
-B.requiresVersionMinor = '2'
+B.requiresVersionMajor = '4'
+B.requiresVersionMinor = '1'
 
 # scripts which should appear in Extensions menu
 B.addToMenu = [
