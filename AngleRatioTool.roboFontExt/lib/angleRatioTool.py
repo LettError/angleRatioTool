@@ -18,8 +18,7 @@ angleRatioToolBundle = ExtensionBundle("AngleRatioTool")
 toolbarIconPath = os.path.join(angleRatioToolBundle.resourcesPath(), "icon.pdf")
 toolbarIcon = AppKit.NSImage.alloc().initWithContentsOfFile_(toolbarIconPath)
 
-dot_size = int(getDefault('glyphViewOffCurvePointsSize')) * 3
-snap_size = dot_size + 6
+
 
 
 
@@ -68,8 +67,8 @@ merz.SymbolImageVendor.registerImageFactory("angleRatio.line", lineSymbolFactory
 
 class RatioTool(EditingTool):
 
-    incomingColor = (1,0,.5, 1)
-    outgoingColor = (.5,0,1, 1)
+    incomingColor = ( 1, 0, .5, 0.8)
+    outgoingColor = (.5, 0,  1, 0.8)
     _offcurveNames = ['offcurve']     # RF1.8: offcurve, RF2.0 offCurve
     balloonDistance = 20
 
@@ -78,25 +77,28 @@ class RatioTool(EditingTool):
         self._rout = None
         self.markerWidth = 12
         self.snapThreshold = .5
-        self.font_size = int(getDefault('textFontSize'))
 
-        drawingLayer = self.extensionContainer(
-            identifier="com.letterror.angleRatioTool", 
-            location="background", 
+        self.dot_size = int(getDefault('glyphViewOffCurvePointsSize')) * 3
+        self.snap_size = self.dot_size + 6
+        self.font_size = int(getDefault('textFontSize')) + 2
+
+        foregroundLayer = self.extensionContainer(
+            identifier="com.letterror.angleRatioTool.fg", 
+            location="foreground", 
             clear=True
             )
 
-        self.outgoingLayer = drawingLayer.appendPathSublayer(
+        self.outgoingLayer = foregroundLayer.appendPathSublayer(
             fillColor=None,
             strokeColor=self.outgoingColor
         )
 
-        self.incomingLayer = drawingLayer.appendPathSublayer(
+        self.incomingLayer = foregroundLayer.appendPathSublayer(
             fillColor=None,
             strokeColor=self.incomingColor
         )
 
-        self.captionTextLayer = drawingLayer.appendTextLineSublayer(
+        self.captionTextLayer = foregroundLayer.appendTextLineSublayer(
            #position=(0, 0),
            #size=(400, 100),
            backgroundColor=self.outgoingColor,
@@ -201,8 +203,10 @@ class RatioTool(EditingTool):
 
                     angleText = f"angle: {round(angle_degrees, 2)}"
 
-                    tp1 = bpt.x + math.cos(angle)*sbd*1.5, bpt.y + math.sin(angle)*sbd*1.5
-                    tp2 = bpt.x - math.cos(angle)*sbd*1.5, bpt.y - math.sin(angle)*sbd*1.5
+                    cap_dist = 1.3 # distance of caption from on-curve
+
+                    tp1 = bpt.x + math.cos(angle)*sbd*cap_dist, bpt.y + math.sin(angle)*sbd*cap_dist
+                    tp2 = bpt.x - math.cos(angle)*sbd*cap_dist, bpt.y - math.sin(angle)*sbd*cap_dist
 
                     self.caption(tp1, ratioText, tp2, angleText)
 
@@ -211,10 +215,10 @@ class RatioTool(EditingTool):
                     dab = math.hypot(bpt.x - apt.x, bpt.y - apt.y)
                     dcb = math.hypot(bpt.x - cpt.x, bpt.y - cpt.y)
                     snap = False
-                    m = dot_size
+                    m = self.dot_size
                     if max(dab, dcb) - min(dab, dcb) < self.snapThreshold:
                         snap = True
-                        m = snap_size
+                        m = self.snap_size
 
                     self.outgoingShape(q, m, angle_degrees)
                     self.incomingShape(p, m, angle_degrees)
@@ -260,12 +264,12 @@ class RatioTool(EditingTool):
         fc = self.incomingColor
         sc = None
         sw = 0
-        lsw = 2
+        lsw = 1
         lsc = self.incomingColor
-        if m == snap_size:
+        if m == self.snap_size:
             fc = None
             sc = self.incomingColor
-            sw = 2
+            sw = 1
             lsw = 0
             lsc = None
 
@@ -285,7 +289,7 @@ class RatioTool(EditingTool):
                 rotation        = angle,
                 imageSettings   = dict(
                                     name        = "angleRatio.line",
-                                    size        = m + 12, 
+                                    size        = m + 20, 
                                     strokeColor = lsc,
                                     strokeWidth = lsw 
                                     )
@@ -296,12 +300,12 @@ class RatioTool(EditingTool):
         fc = self.outgoingColor
         sc = None
         sw = 0
-        lsw = 2
+        lsw = 1
         lsc = self.outgoingColor
-        if m == snap_size:
+        if m == self.snap_size:
             fc = None
             sc = self.outgoingColor
-            sw = 2
+            sw = 1
             lsw = 0
             lsc = None
 
@@ -321,7 +325,7 @@ class RatioTool(EditingTool):
                 rotation        = angle,
                 imageSettings   = dict(
                                     name        = "angleRatio.line",
-                                    size        = m + 12, 
+                                    size        = m + 20, 
                                     strokeColor = lsc,
                                     strokeWidth = lsw 
                                     )
