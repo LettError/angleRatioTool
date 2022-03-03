@@ -1,40 +1,113 @@
-import mojo
 import os
-import AppKit
-from mojo.events import installTool, EditingTool, BaseEventTool, setActiveEventTool
-from mojo.drawingTools import *
-from mojo.UI import UpdateCurrentGlyphView
-from defconAppKit.windows.baseWindow import BaseWindowController
 import math
+import AppKit
+from mojo.extensions import ExtensionBundle
+from mojo.events import installTool, EditingTool
+from mojo.drawingTools import *
+from mojo.UI import UpdateCurrentGlyphView, getDefault
+import merz
+from merz.tools.drawingTools import NSImageDrawingTools
 
-#
-#
-#     A visualisation for RoboFont
-#     Show the ratio between the length of incoming and outgoing sections of bcps and tangents.
+#     A visualisation for RoboFont 4
+#     Show the ratio between the length of outgoing and incoming sections of bcps and tangents.
 #     Show the angle
 #     Draw in active and inactive views so we can compare different glyphs
 #     erik@letterror.com
 
-angleRatioToolBundle = mojo.extensions.ExtensionBundle("AngleRatioTool")
+angleRatioToolBundle = ExtensionBundle("AngleRatioTool")
 toolbarIconPath = os.path.join(angleRatioToolBundle.resourcesPath(), "icon.pdf")
 toolbarIcon = AppKit.NSImage.alloc().initWithContentsOfFile_(toolbarIconPath)
 
+dot_size = int(getDefault('glyphViewOffCurvePointsSize')) * 3
+snap_size = dot_size + 6
+
+
+def dotSymbolFactory(
+        size,
+        color,
+        strokeColor,
+        strokeWidth=0,
+        ):
+    # create a image draw bot 
+    bot = NSImageDrawingTools((size, size))
+
+    bot.fill(None)
+    if not color == None:
+        bot.fill(*color)
+    bot.stroke(None)
+    if not strokeColor == None:
+        bot.stroke(*strokeColor)
+    bot.strokeWidth(strokeWidth)
+    # bot.translate(width / 2 + 0.25, height / 2 + 0.25)
+    bot.oval(strokeWidth/2,strokeWidth/2,size-strokeWidth,size-strokeWidth)
+    # return the image
+    return bot.getImage()
+
+merz.SymbolImageVendor.registerImageFactory("angleRatio.dot", dotSymbolFactory)
+
+def lineSymbolFactory(
+        size,
+        strokeColor,
+        strokeWidth=2,
+        ):
+    # create a image draw bot 
+    bot = NSImageDrawingTools((size, size))
+
+    bot.fill(None)
+    bot.stroke(None)
+    if not strokeColor == None:
+        bot.stroke(*strokeColor)
+    bot.strokeWidth(strokeWidth)
+    bot.line((0,size/2),(size,size/2))
+    # return the image
+    return bot.getImage()
+
+merz.SymbolImageVendor.registerImageFactory("angleRatio.line", lineSymbolFactory)
+
+
 class RatioTool(EditingTool):
-    balloonDistance = 100
-    textAttributes = {
-        AppKit.NSFontAttributeName : AppKit.NSFont.systemFontOfSize_(10),
-        AppKit.NSForegroundColorAttributeName : AppKit.NSColor.whiteColor(),
-    }
-    aa = .6
-    incomingColor = AppKit.NSColor.colorWithCalibratedRed_green_blue_alpha_(1,0,.5, aa)
-    outgoingColor = AppKit.NSColor.colorWithCalibratedRed_green_blue_alpha_(.5,0,1, aa)
-    _offcurveNames = ['offcurve', 'offCurve']     # RF1.8: offcurve, RF2.0 offCurve
+
+    incomingColor = (1,0,.5, 1)
+    outgoingColor = (.5,0,1, 1)
+    _offcurveNames = ['offcurve']     # RF1.8: offcurve, RF2.0 offCurve
+    balloonDistance = 20
 
     def setup(self):
         self._rin = None
         self._rout = None
         self.markerWidth = 12
         self.snapThreshold = .5
+        
+        drawingLayer = self.extensionContainer(
+            identifier="com.letterror.angleRatioTool", 
+            location="background", 
+            clear=True
+            )
+
+        self.outgoingLayer = drawingLayer.appendPathSublayer(
+            fillColor=None,
+            strokeColor=self.outgoingColor
+        )
+
+        self.incomingLayer = drawingLayer.appendPathSublayer(
+            fillColor=None,
+            strokeColor=self.incomingColor
+        )
+
+        self.captionTextLayer = drawingLayer.appendTextLineSublayer(
+           #position=(0, 0),
+           #size=(400, 100),
+           backgroundColor=self.outgoingColor,
+           text="",
+           fillColor=(1, 1, 1, 1),
+           horizontalAlignment="center"
+        )
+
+        self.outgoingLayer.setVisible(True)
+        self.incomingLayer.setVisible(True)
+        self.captionTextLayer.setVisible(True)
+
+        self.update()
 
     def getToolbarTip(self):
         return 'Angle Ratio Tool'
@@ -43,19 +116,7 @@ class RatioTool(EditingTool):
         ## return the toolbar icon
         return toolbarIcon
     
-    def drawInactive(self, viewScale, glyph=None, view=None):
-        # also draw when the view is inactive so we can compare different windows
-        self.draw(viewScale, RGlyph(glyph))
-        
-    def draw(self, viewScale, g=None):
-        if g is None:
-            g =  self.getGlyph()
-        if g is not None:
-            save()
-            self.getRatio(g, viewScale)
-            restore()
-    
-    def getRatio(self, g, viewScale):
+    def getRatio(self, g):
         # get the in/out ratio of selected smooth points
         for c in g.contours:
             if c is None: continue
@@ -72,21 +133,6 @@ class RatioTool(EditingTool):
                 npt = c.points[(i+1)%l]
                 nnpt = c.points[(i+2)%l]
 
-                # if True:
-                #     print('\npppt', pppt, "\t", pppt.type, "\t", pppt.smooth, pppt.index)
-                #     print('ppt', ppt, "\t", ppt.type, "\t", ppt.smooth)
-                #     print('p', p, "\t", p.type, "\t", p.smooth)
-                #     print('npt', npt, "\t", npt.type, "\t", npt.smooth)
-                #     print('nnpt', nnpt, "\t", nnpt.type, "\t", nnpt.smooth)
-                
-                #     print('-'*40)
-                #     print("ppt.type in self._offcurveNames", ppt.type in self._offcurveNames, ppt.type)
-                #     print("ppt.type==curve", ppt.type=="curve")
-                #     print("p.smooth==True", p.smooth==True)
-                #     print("p.type==line", p.type=="line")
-                #     print("npt.type in self._offcurveNames", npt.type in self._offcurveNames)
-                #     print('-'*40)
-                
                 apt = bpt = cpt = r = rin = rout = None
                 
                 if p.type in self._offcurveNames and npt.type=="curve" and npt.smooth==True and nnpt.type in self._offcurveNames:
@@ -132,70 +178,181 @@ class RatioTool(EditingTool):
                     bpt = ppt
                     cpt = p
 
+                ratioText = ""
+                angleText = ""
                 if apt is not None and bpt is not None and cpt is not None:
                     rin = math.hypot(apt.x-bpt.x,apt.y-bpt.y)
                     rout = math.hypot(cpt.x-bpt.x,cpt.y-bpt.y)
                     r = rin / rout
                 if r is not None:
-                    # text bubble for the ratio
+                    # text bubbles
                     angle = math.atan2(apt.y-cpt.y,apt.x-cpt.x) + .5* math.pi
-                    sbd = self.balloonDistance * viewScale * .25
-                    mp = math.cos(angle) * self.markerWidth* viewScale , math.sin(angle) * self.markerWidth* viewScale 
-                    tp = bpt.x + math.cos(angle)*sbd*2, bpt.y + math.sin(angle)*sbd*2
-                    self.getNSView()._drawTextAtPoint(
-                        "ratio %3.4f"%(r ),
-                        self.textAttributes,
-                        tp,
-                        yOffset=0,
-                        drawBackground=True,
-                        backgroundColor=self.outgoingColor)
-                    tp = bpt.x - math.cos(angle)*sbd*2, bpt.y - math.sin(angle)*sbd*2
-                    self.getNSView()._drawTextAtPoint(
-                        "angle %3.4f"%(math.degrees(angle)%180 ),
-                        self.textAttributes,
-                        tp,
-                        yOffset=0,
-                        drawBackground=True,
-                        backgroundColor=self.incomingColor)
+                    sbd = self.balloonDistance * 3
+                    mp = math.cos(angle) * self.markerWidth , math.sin(angle) * self.markerWidth 
+                    
+                    if math.isclose(r,1,abs_tol=0.001):
+                        ratioText = "snap!"
+                    else:
+                        ratioText = f"ratio: {round(r, 2)}"
+
+                    angle_degrees = math.degrees(angle)%180
+
+                    angleText = f"angle: {round(angle_degrees, 2)}"
+
+                    tp1 = bpt.x + math.cos(angle)*sbd*1.5, bpt.y + math.sin(angle)*sbd*1.5
+                    tp2 = bpt.x - math.cos(angle)*sbd*1.5, bpt.y - math.sin(angle)*sbd*1.5
+
+                    self.caption(tp1, ratioText, tp2, angleText)
+
                     p = bpt.x + bpt.x - apt.x, bpt.y + bpt.y - apt.y
                     q = bpt.x + bpt.x - cpt.x, bpt.y + bpt.y - cpt.y
                     dab = math.hypot(bpt.x - apt.x, bpt.y - apt.y)
                     dcb = math.hypot(bpt.x - cpt.x, bpt.y - cpt.y)
                     snap = False
-                    m = 3
+                    m = dot_size
                     if max(dab, dcb) - min(dab, dcb) < self.snapThreshold:
                         snap = True
-                        m = 5
-                    stroke(1,0,.5)
-                    strokeWidth(.75*viewScale)
-                    line((p[0]+mp[0], p[1]+mp[1]), (p[0]-mp[0], p[1]-mp[1]))
-                    line((q[0]+mp[0], q[1]+mp[1]), (q[0]-mp[0], q[1]-mp[1]))
-                    fill(1,0,.5)
-                    self.dot(p, viewScale, m)
-                    self.dot(q, viewScale, m)
+                        m = snap_size
+
+                    self.outgoingShape(q, m, angle_degrees)
+                    self.incomingShape(p, m, angle_degrees)
                     self._rin = rin
                     self._rout = rout
     
-    def dot(self, pos, viewScale, m=3):
-        save()
-        stroke(None)
-        m = m * viewScale
-        oval(pos[0]-m, pos[1]-m, 2*m, 2*m)
-        restore()
+    def caption(self, point1, text1, point2, text2):
+        pd_x = 10
+        pd_y = 2
+        ps = 12
+        cr = ps
+
+        ratioCaptionLayer = self.captionTextLayer.appendTextLineSublayer(
+           position=point1,
+           size=(20, 20),
+           pointSize=ps,
+           backgroundColor=None,
+           text=f"{text1}",
+           fillColor=self.outgoingColor,
+           horizontalAlignment="center",
+           verticalAlignment="bottom",
+           weight='bold',
+           figureStyle='tabular',
+           padding=(pd_x, pd_y),
+           cornerRadius = cr
+        )
+        angleCaptionLayer = self.captionTextLayer.appendTextLineSublayer(
+           position=point2,
+           size=(20, 20),
+           pointSize=ps,
+           backgroundColor=None,
+           text=f"{text2}",
+           fillColor=self.incomingColor,
+           horizontalAlignment="center",
+           verticalAlignment="bottom",
+           weight='bold',
+           figureStyle='tabular',
+           padding=(pd_x, pd_y),
+           cornerRadius = cr
+        )
+
+    def incomingShape(self, pos, m=200, angle=0):
+        fc = self.incomingColor
+        sc = None
+        sw = 0
+        lsw = 2
+        lsc = self.incomingColor
+        if m == snap_size:
+            fc = None
+            sc = self.incomingColor
+            sw = 2
+            lsw = 0
+            lsc = None
+
+        # using symbols so the dot doesn't scale upon zoom
+        dotLayer = self.incomingLayer.appendSymbolSublayer(
+                position        = (pos[0], pos[1]),
+                imageSettings   = dict(
+                                    name        = "angleRatio.dot",
+                                    size        = m+sw, 
+                                    color       = fc,
+                                    strokeColor = sc,
+                                    strokeWidth = sw 
+                                    )
+                )
+        lineLayer = self.outgoingLayer.appendSymbolSublayer(
+                position        = (pos[0], pos[1]),
+                rotation        = angle,
+                imageSettings   = dict(
+                                    name        = "angleRatio.line",
+                                    size        = m + 12, 
+                                    strokeColor = lsc,
+                                    strokeWidth = lsw 
+                                    )
+                )
+        
+
+    def outgoingShape(self, pos, m=200, angle=0):
+        fc = self.outgoingColor
+        sc = None
+        sw = 0
+        lsw = 2
+        lsc = self.outgoingColor
+        if m == snap_size:
+            fc = None
+            sc = self.outgoingColor
+            sw = 2
+            lsw = 0
+            lsc = None
+
+        # using symbols so the dot doesn't scale upon zoom
+        dotLayer = self.outgoingLayer.appendSymbolSublayer(
+                position        = (pos[0], pos[1]),
+                imageSettings   = dict(
+                                    name        = "angleRatio.dot",
+                                    size        = m+sw, 
+                                    color       = fc,
+                                    strokeColor = sc,
+                                    strokeWidth = sw 
+                                    )
+                )
+        lineLayer = self.outgoingLayer.appendSymbolSublayer(
+                position        = (pos[0], pos[1]),
+                rotation        = angle,
+                imageSettings   = dict(
+                                    name        = "angleRatio.line",
+                                    size        = m + 12, 
+                                    strokeColor = lsc,
+                                    strokeWidth = lsw 
+                                    )
+                )
+
+    def update(self):
+        self.clearAll()
+        g = CurrentGlyph()
+        self.getRatio(g)
+        
+    def mouseDragged(self, point=None, delta=None):
+        self.update()
 
     def mouseDown(self, point, event):
-        pass
+        self.update()
 
     def mouseUp(self, xx):
         self._rin = None
         self._rout = None
+        self.update()
     
-    # def keyDown(self, event):
-    #     letter = event.characters()
-    #     mods = self.getModifiers()
-    #     cmd = mods['commandDown'] > 0
-    #     option = mods['optionDown'] > 0
+    def keyDown(self, event):
+        self.update()
+
+    def becomeInactive(self):
+        self.clearAll()
+
+    def clearAll(self):
+        self.outgoingLayer.clearSublayers()
+        self.incomingLayer.clearSublayers()
+        self.captionTextLayer.clearSublayers()
             
 p = RatioTool()
 installTool(p)
 
+print('installed', p)
