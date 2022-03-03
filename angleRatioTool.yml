@@ -1,4 +1,4 @@
-description: This RoboFont extension shows the ratio between the length of incoming and outgoing sections of bcps and tangents. This can help in preparing masters for interpolation. 
+description: This shows the ratio between the length of incoming and outgoing sections of bcps and tangents. This can help in preparing masters for interpolation. 
 developer: LettError
 developerURL: http://letterror.com
 extensionName: AngleRatioTool
