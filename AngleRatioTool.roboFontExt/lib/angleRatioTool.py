@@ -2,7 +2,7 @@ import os
 import math
 import AppKit
 from mojo.extensions import ExtensionBundle
-from mojo.events import installTool, EditingTool, BaseEventTool, setActiveEventTool
+from mojo.events import installTool, EditingTool
 from mojo.drawingTools import *
 from mojo.UI import UpdateCurrentGlyphView, getDefault
 import merz
@@ -106,6 +106,8 @@ class RatioTool(EditingTool):
         self.outgoingLayer.setVisible(True)
         self.incomingLayer.setVisible(True)
         self.captionTextLayer.setVisible(True)
+
+        self.update()
 
     def getToolbarTip(self):
         return 'Angle Ratio Tool'
@@ -324,9 +326,7 @@ class RatioTool(EditingTool):
                 )
 
     def update(self):
-        self.outgoingLayer.clearSublayers()
-        self.incomingLayer.clearSublayers()
-        self.captionTextLayer.clearSublayers()
+        self.clearAll()
         g = CurrentGlyph()
         self.getRatio(g)
         
@@ -343,6 +343,14 @@ class RatioTool(EditingTool):
     
     def keyDown(self, event):
         self.update()
+
+    def becomeInactive(self):
+        self.clearAll()
+
+    def clearAll(self):
+        self.outgoingLayer.clearSublayers()
+        self.incomingLayer.clearSublayers()
+        self.captionTextLayer.clearSublayers()
             
 p = RatioTool()
 installTool(p)
