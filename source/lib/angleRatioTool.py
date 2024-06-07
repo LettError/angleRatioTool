@@ -2,7 +2,7 @@ import os
 import math
 import AppKit
 from mojo.extensions import ExtensionBundle
-from mojo.events import installTool, EditingTool
+from mojo.events import installTool, EditingTool, addObserver, removeObserver
 from mojo.drawingTools import *
 from mojo.UI import UpdateCurrentGlyphView, getDefault
 import merz
@@ -110,6 +110,8 @@ class RatioTool(EditingTool):
         self.outgoingLayer.setVisible(True)
         self.incomingLayer.setVisible(True)
         self.captionTextLayer.setVisible(True)
+
+        addObserver(self, "didUndo", "didUndo")
 
         self.update()
 
@@ -350,8 +352,12 @@ class RatioTool(EditingTool):
     def keyDown(self, event):
         self.update()
 
+    def didUndo(self, notification):
+        self.update()
+
     def becomeInactive(self):
         self.clearAll()
+        removeObserver(self, "didUndo")
 
     def clearAll(self):
         self.outgoingLayer.clearSublayers()
