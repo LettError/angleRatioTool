@@ -207,10 +207,10 @@ class RatioTool(EditingTool):
 
                     cap_dist = 1.3 # distance of caption from on-curve
 
-                    tp1 = bpt.x + math.cos(angle)*sbd*cap_dist, bpt.y + math.sin(angle)*sbd*cap_dist
-                    tp2 = bpt.x - math.cos(angle)*sbd*cap_dist, bpt.y - math.sin(angle)*sbd*cap_dist
+                    tp1 = math.cos(angle)*sbd*cap_dist, math.sin(angle)*sbd*cap_dist
+                    tp2 = -math.cos(angle)*sbd*cap_dist, -math.sin(angle)*sbd*cap_dist
 
-                    self.caption(tp1, ratioText, tp2, angleText)
+                    self.caption((bpt.x, bpt.y), tp1, tp2, ratioText, angleText)
 
                     p = bpt.x + bpt.x - apt.x, bpt.y + bpt.y - apt.y
                     q = bpt.x + bpt.x - cpt.x, bpt.y + bpt.y - cpt.y
@@ -227,14 +227,15 @@ class RatioTool(EditingTool):
                     self._rin = rin
                     self._rout = rout
     
-    def caption(self, point1, text1, point2, text2):
+    def caption(self, point, offset1, offset2, text1, text2):
         pd_x = 10
         pd_y = 2
         ps = self.font_size
         cr = ps
 
         ratioCaptionLayer = self.captionTextLayer.appendTextLineSublayer(
-           position=point1,
+           position=point,
+           offset=offset1,
            size=(20, 20),
            pointSize=ps,
            backgroundColor=None,
@@ -248,7 +249,8 @@ class RatioTool(EditingTool):
            cornerRadius = cr
         )
         angleCaptionLayer = self.captionTextLayer.appendTextLineSublayer(
-           position=point2,
+           position=point,
+           offset=offset2,
            size=(20, 20),
            pointSize=ps,
            backgroundColor=None,
