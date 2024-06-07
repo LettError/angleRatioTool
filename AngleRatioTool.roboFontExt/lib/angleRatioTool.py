@@ -15,7 +15,7 @@ from merz.tools.drawingTools import NSImageDrawingTools
 #     erik@letterror.com
 
 angleRatioToolBundle = ExtensionBundle("AngleRatioTool")
-toolbarIconPath = os.path.join(angleRatioToolBundle.resourcesPath(), "icon.pdf")
+toolbarIconPath = os.path.join(angleRatioToolBundle.resourcesFolder, "icon.pdf")
 toolbarIcon = AppKit.NSImage.alloc().initWithContentsOfFile_(toolbarIconPath)
 
 
