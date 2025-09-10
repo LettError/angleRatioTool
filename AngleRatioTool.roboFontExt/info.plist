@@ -3,16 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>addToMenu</key>
-	<array>
-		<dict>
-			<key>path</key>
-			<string>angleRatioTool.py</string>
-			<key>preferredName</key>
-			<string>Angle Ratio Tool</string>
-			<key>shortKey</key>
-			<string></string>
-		</dict>
-	</array>
+	<array/>
 	<key>developer</key>
 	<string>LettError</string>
 	<key>developerURL</key>
@@ -30,8 +21,8 @@
 	<key>requiresVersionMinor</key>
 	<string>0</string>
 	<key>timeStamp</key>
-	<real>1646336795.271745</real>
+	<real>1717794091.775299</real>
 	<key>version</key>
-	<string>0.3</string>
+	<string>0.4</string>
 </dict>
 </plist>

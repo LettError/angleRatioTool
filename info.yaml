@@ -1,0 +1,9 @@
+name: AngleRatioTool
+developer: LettError
+developerURL: http://letterror.com
+mainScript: angleRatioTool.py
+launchAtStartUp: true
+version: 0.4
+html: true
+requiresVersionMajor: '4'
+requiresVersionMinor: '0'
